@@ -6,5 +6,8 @@ class WriteProcess(Process):
         super().__init__(pid)
         
         
-    def execute(self) -> None:
-        pass
+    def execute(self, queue) -> None:
+        with open("computation.txt", "a") as f:
+            for item in queue:
+                f.write(item)
+                f.write("\n")
