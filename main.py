@@ -45,6 +45,15 @@ def create_process(queue: ProcessQueue):
         print("Processo criado e adicionado à fila com sucesso!")
 
 
+def run_next(queue: ProcessQueue):
+    if queue.current_queue:
+        process_menu = queue.current_queue.pop(0)
+        process_menu.execute()
+        print("Processo executado e removido da fila com sucesso!")
+    else:
+        print("Não há processos na fila para executar.")
+
+
 def main() -> None:
 
     current_queue = ProcessQueue([])
@@ -69,7 +78,7 @@ def main() -> None:
             create_process(current_queue)
 
         elif opt == 2:
-            pass
+            run_next(current_queue)
         
         elif opt == 3:
             print("Programa encerrado.")
