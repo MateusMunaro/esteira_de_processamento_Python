@@ -1,4 +1,5 @@
 from write_process import WriteProcess
+import pickle
 import os
 from menu import Menu
 from computation_process import ComputationProcess
@@ -53,6 +54,31 @@ def run_next(queue: ProcessQueue):
     else:
         print("Não há processos na fila para executar.")
 
+def run_specific_process(queue: ProcessQueue):
+    pid = int(input("Digite o PID do processo a ser executado: "))
+    found = False
+
+    for i, processo in enumerate(queue.current_queue):
+        if processo.pid == pid:
+            found = True
+            processo.execute()
+            queue.current_queue.pop(i)
+            print(f"Processo com PID {pid} executado e removido da fila com sucesso!")
+            break
+
+    if not found:
+        print("Processo com PID informado não encontrado na fila.")
+
+def save_queue(queue: ProcessQueue, filename: str):
+    with open(filename, 'wb') as file:
+        pickle.dump(queue, file)
+    print(f"Fila de processos salva no arquivo '{filename}' com sucesso!")
+
+def load_queue(filename: str) -> ProcessQueue:
+    with open(filename, 'rb') as file:
+        queue = pickle.load(file)
+    print(f"Fila de processos carregada do arquivo '{filename}' com sucesso!")
+    return queue
 
 def main() -> None:
 
@@ -81,13 +107,15 @@ def main() -> None:
             run_next(current_queue)
         
         elif opt == 3:
-            print("Programa encerrado.")
-            break
+            run_specific_process(current_queue)
+
         elif opt == 4:
-            pass
+            filename = input("Digite o nome do arquivo para salvar a fila de processos: ")
+            save_queue(current_queue, filename)
 
         elif opt == 5:
-            pass
+            filename = input("Digite o nome do arquivo para carregar a fila de processos: ")
+            current_queue = load_queue(filename)
 
         elif opt == 6:
             break
