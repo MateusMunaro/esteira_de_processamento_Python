@@ -1,3 +1,4 @@
+import json
 from process import Process
 
 
@@ -8,6 +9,5 @@ class WriteProcess(Process):
         
     def execute(self, queue) -> None:
         with open("computation.txt", "a") as f:
-            for item in queue:
-                f.write(item)
-                f.write("\n")
+            for process in queue.current_queue:
+                f.writelines(json.dumps(process.__dict__()) + "\n")

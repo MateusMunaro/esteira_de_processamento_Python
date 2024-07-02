@@ -2,8 +2,8 @@ from random import randint
 
 
 class ProcessQueue:
-    def __init__(self, current_queue: list = []) -> None:
-        self.__qid = randint(1, 1000)
+    def __init__(self, qid: int = randint(1, 1000), current_queue: list = []) -> None:
+        self.__qid = qid
         self.__current_queue = current_queue
         
     @property
@@ -24,3 +24,9 @@ class ProcessQueue:
     def current_queue(self, current_queue: int):
         self.__current_queue = current_queue
     
+
+    def __dict__(self):
+        return {
+            "qid": self.qid,
+            "current_queue": self.current_queue
+        }

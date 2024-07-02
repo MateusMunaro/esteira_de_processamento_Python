@@ -1,5 +1,5 @@
 from write_process import WriteProcess
-import pickle
+import json
 import os
 from menu import Menu
 from computation_process import ComputationProcess
@@ -10,8 +10,9 @@ from process_queue import ProcessQueue
 
 
 def create_process(queue: ProcessQueue):
-
+    general_pid = 0
     while True:
+        
         sub_menu_list = [
             "___Tipos de processo disponíveis:___",
             "1. Processo de Computação",
@@ -22,34 +23,39 @@ def create_process(queue: ProcessQueue):
         ]
         second_menu = Menu(sub_menu_list)
         opt = second_menu.run()
-        processo = None
 
         if opt == 1:
-            expression = input("Digite a expressão a ser executada: ")
-            processo = ComputationProcess(expression)
+            processo = ComputationProcess(general_pid)
+            queue.current_queue.append(processo)
         elif opt == 2:
-            document = input("Digite o documento a ser impresso: ")
-            processo = PrintProcess(document)
+            processo = PrintProcess(general_pid, queue.current_queue)
+            processo.execute(queue)
         elif opt == 3:
-            file_name = input("Digite o nome do arquivo a ser lido: ")
-            processo = ReadProcess(file_name)
+            processo = ReadProcess(general_pid)
+            data = processo.execute(queue)
+            
+
+            print("Processos de leitura criados e adicionados à fila com sucesso!")
+
         elif opt == 4:
-            content = input("Digite o conteúdo a ser escrito: ")
-            processo = WriteProcess(content)
+            processo = WriteProcess(general_pid)
+            processo.execute(queue)
         elif opt == 5:
             break
         else:
             print("Opção inválida.")
             return
-
-        queue.current_queue.append(processo)
+        
+        
         print("Processo criado e adicionado à fila com sucesso!")
+
+        general_pid += 1
 
 
 def run_next(queue: ProcessQueue):
     if queue.current_queue:
-        process_menu = queue.current_queue.pop(0)
-        process_menu.execute()
+        queue.current_queue[0].execute()
+        queue.current_queue = queue.current_queue[1:]
         print("Processo executado e removido da fila com sucesso!")
     else:
         print("Não há processos na fila para executar.")
@@ -58,27 +64,29 @@ def run_specific_process(queue: ProcessQueue):
     pid = int(input("Digite o PID do processo a ser executado: "))
     found = False
 
-    for i, processo in enumerate(queue.current_queue):
+    for processo in queue.current_queue:
         if processo.pid == pid:
             found = True
             processo.execute()
-            queue.current_queue.pop(i)
-            print(f"Processo com PID {pid} executado e removido da fila com sucesso!")
+            print(f"Processo com PID {pid} executado com sucesso!")
             break
 
     if not found:
         print("Processo com PID informado não encontrado na fila.")
 
+
 def save_queue(queue: ProcessQueue, filename: str):
-    with open(filename, 'wb') as file:
-        pickle.dump(queue, file)
-    print(f"Fila de processos salva no arquivo '{filename}' com sucesso!")
+    queue_dict = queue.__dict__()
+    with open(filename, 'w') as file:
+         json.dump(queue_dict, file)
+
+    print(f'fila de processos salva no arquivo \'{filename}\' com sucesso.')
 
 def load_queue(filename: str) -> ProcessQueue:
-    with open(filename, 'rb') as file:
-        queue = pickle.load(file)
-    print(f"Fila de processos carregada do arquivo '{filename}' com sucesso!")
-    return queue
+    with open(filename, 'r') as file:
+        queue_dict = json.load(file)
+
+    return ProcessQueue(**queue_dict)
 
 def main() -> None:
 
@@ -112,10 +120,12 @@ def main() -> None:
         elif opt == 4:
             filename = input("Digite o nome do arquivo para salvar a fila de processos: ")
             save_queue(current_queue, filename)
+            print("Fila de processos salva com sucesso.")
 
         elif opt == 5:
             filename = input("Digite o nome do arquivo para carregar a fila de processos: ")
             current_queue = load_queue(filename)
+            print("Fila de processos carregada com sucesso.")
 
         elif opt == 6:
             break

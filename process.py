@@ -13,3 +13,7 @@ class Process:
     def execute(self) -> None:
         pass
         
+    def __dict__(self):
+        return {
+            "pid": self.pid
+        }
