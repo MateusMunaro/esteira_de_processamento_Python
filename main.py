@@ -10,7 +10,7 @@ from process_queue import ProcessQueue
 
 
 def create_process(queue: ProcessQueue):
-    general_pid = 0
+    general_pid = 1
     while True:
         
         sub_menu_list = [
@@ -26,13 +26,16 @@ def create_process(queue: ProcessQueue):
 
         if opt == 1:
             processo = ComputationProcess(general_pid)
+            processo.execute(queue)
             queue.current_queue.append(processo)
         elif opt == 2:
             processo = PrintProcess(general_pid, queue.current_queue)
             processo.execute(queue)
+            queue.current_queue.append(processo)
         elif opt == 3:
             processo = ReadProcess(general_pid)
             data = processo.execute(queue)
+            queue.current_queue.append(processo)
             
 
             print("Processos de leitura criados e adicionados à fila com sucesso!")
@@ -40,6 +43,7 @@ def create_process(queue: ProcessQueue):
         elif opt == 4:
             processo = WriteProcess(general_pid)
             processo.execute(queue)
+            queue.current_queue.append(processo)
         elif opt == 5:
             break
         else:
@@ -76,15 +80,18 @@ def run_specific_process(queue: ProcessQueue):
 
 
 def save_queue(queue: ProcessQueue, filename: str):
-    queue_dict = queue.__dict__()
     with open(filename, 'w') as file:
-         json.dump(queue_dict, file)
+        for p in queue.current_queue:
+            file.write(json.dumps(p.__dict__()) + '\n')
 
     print(f'fila de processos salva no arquivo \'{filename}\' com sucesso.')
 
-def load_queue(filename: str) -> ProcessQueue:
+def load_queue(filename: str, queue: ProcessQueue) -> ProcessQueue:
     with open(filename, 'r') as file:
-        queue_dict = json.load(file)
+        lines = file.readlines()
+        queue_dict = {}
+        for line in lines:
+            queue.current_queue.append(ComputationProcess(**json.loads(line)))
 
     return ProcessQueue(**queue_dict)
 
@@ -124,7 +131,7 @@ def main() -> None:
 
         elif opt == 5:
             filename = input("Digite o nome do arquivo para carregar a fila de processos: ")
-            current_queue = load_queue(filename)
+            current_queue = load_queue(filename, current_queue)
             print("Fila de processos carregada com sucesso.")
 
         elif opt == 6:

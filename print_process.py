@@ -9,8 +9,7 @@ class PrintProcess(Process):
     def __dict__(self):
         return {
             "pid": self.pid,
-            "processlist": self.__processlist
-            
+            "processlist": None
         }
         
     def execute(self, queue=None) -> None:
