@@ -22,7 +22,9 @@ class ReadProcess(Process):
             self.clean_file()    
 
         for iten in data:
-                processo = ComputationProcess(**iten)
+            if iten["type"] == "ComputationProcess":
+                iten_with_no_type = {k: v for k, v in iten.items() if k != 'type'}
+                processo = ComputationProcess(**iten_with_no_type)
                 queue.current_queue.append(processo)
 
         print("Processos de leitura criados e adicionados à fila com sucesso!")

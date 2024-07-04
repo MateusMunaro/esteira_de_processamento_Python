@@ -1,3 +1,2 @@
-{"pid": 1, "n1": 1, "n2": 1, "operation": 1}
-{"pid": 1, "processlist": null}
-{"pid": 2, "processlist": null}
+{"pid": 1658, "expression": "1 + 1", "type": "ComputationProcess"}
+{"pid": 1659, "type": "PrintProcess"}

@@ -2,23 +2,33 @@ from process import Process
 
 
 class PrintProcess(Process):
-    def __init__(self, pid: int, processlist: list) -> None:
+    def __init__(self, pid: int) -> None:
         super().__init__(pid)
-        self.__processlist = processlist
 
-    def __dict__(self):
-        return {
-            "pid": self.pid,
-            "processlist": None
-        }
-        
     def execute(self, queue=None) -> None:
+        
+        print("\nFila de processos:")
+
+        def check_file_or_create_new():
+            try:
+                with open("computation.txt", "r") as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        print(line)
+            except FileNotFoundError:
+                with open("computation.txt", "w") as f:
+                    f.write("")
+
+        check_file_or_create_new()
+
         with open("computation.txt", "r") as f:
             lines = f.readlines()
             print("\nFila de processos no arquivo:")
             for line in lines:
                 print(line)
 
-        print("\nFila de processos na memoria:")
-        for process in self.__processlist:
-            print(f"{process.pid} | {process.__class__.__name__}")
+        if queue.current_queue is not None:
+            for processo in queue.current_queue:
+                print(f"{processo.pid} : {processo.__class__.__name__}")
+        else:
+            print("Fila de processos vazia.")

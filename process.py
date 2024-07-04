@@ -15,5 +15,6 @@ class Process:
         
     def __dict__(self):
         return {
-            "pid": self.pid
+            "pid": self.pid,
+            "type": self.__class__.__name__
         }
